@@ -10,9 +10,11 @@ permissions:
   pages: write
   id-token: write
 
+# don't cancel in-flight deploys: a canceled Pages deployment permanently
+# poisons that commit SHA's deployment ID
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -26,15 +28,8 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: .
-      # Pages deployments intermittently sit in deployment_queued past the
-      # action's hard 10-min ceiling — retry up to 3 attempts per run
+      # NOTE: do not add retry steps here — the deployment ID is the commit
+      # SHA, so a timed-out (canceled) first attempt makes same-run retries
+      # fail instantly with "Deployment cancelled". Retry = push a new commit.
       - id: deployment
-        uses: actions/deploy-pages@v4
-        continue-on-error: true
-      - id: deployment2
-        if: steps.deployment.outcome == 'failure'
-        uses: actions/deploy-pages@v4
-        continue-on-error: true
-      - id: deployment3
-        if: steps.deployment.outcome == 'failure' && steps.deployment2.outcome == 'failure'
         uses: actions/deploy-pages@v4
