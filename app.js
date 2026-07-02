@@ -3,6 +3,20 @@
 const LS_KEY = 'message-studio-v1';
 const $ = s => document.querySelector(s);
 
+// logical (CSS-point) screen sizes — selecting the model you're viewing on
+// makes the phone render 1:1 with no scaling
+const MODELS = {
+  '16promax':  { label: 'iPhone 16 / 17 Pro Max', w: 440, h: 956 },
+  '16plus':    { label: 'iPhone 16 Plus / 15 Pro Max', w: 430, h: 932 },
+  'air':       { label: 'iPhone Air', w: 420, h: 912 },
+  '16pro':     { label: 'iPhone 16 Pro / 17', w: 402, h: 874 },
+  'iphone16':  { label: 'iPhone 16 / 15 / 14 Pro', w: 393, h: 852 },
+  'iphone14':  { label: 'iPhone 14 / 13 / 12', w: 390, h: 844 },
+  'iphone11':  { label: 'iPhone 11 / XR', w: 414, h: 896 },
+  'mini':      { label: 'iPhone 13 / 12 mini', w: 375, h: 812 },
+  'se':        { label: 'iPhone SE', w: 375, h: 667 },
+};
+
 const phone = $('#phone');
 const thread = $('#thread');
 const topbar = $('#topbar');
@@ -21,6 +35,7 @@ function minsAgo(n) {
 function defaultState() {
   return {
     contact: { name: 'Alex', avatar: null },
+    model: '16promax',
     battery: 82,
     showPercent: true,
     island: true,
@@ -60,9 +75,11 @@ function load() {
 let saveTimer = null;
 function save() {
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (_) {}
-  }, 120);
+  saveTimer = setTimeout(saveNow, 120);
+}
+function saveNow() {
+  clearTimeout(saveTimer);
+  try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (_) {}
 }
 
 /* ---------------- time formatting ---------------- */
@@ -205,10 +222,31 @@ function applyFlags() {
   });
 }
 
+let lastPortrait = null;
 function fit() {
-  const W = 390, H = 844;
-  const vw = window.innerWidth, vh = window.innerHeight;
-  const portrait = vh / vw >= 1.25; // phone/tablet held upright: fill edge-to-edge
+  const model = MODELS[state.model] || MODELS['16promax'];
+  const W = model.w, H = model.h;
+
+  // size against the VISUAL viewport so the on-screen keyboard shrinks the
+  // phone and the composer lands right on top of the keyboard
+  const vv = window.visualViewport;
+  const vw = vv ? vv.width : window.innerWidth;
+  const vh = vv ? vv.height : window.innerHeight;
+
+  const stage = $('#stage');
+  stage.style.top = (vv ? vv.offsetTop : 0) + 'px';
+  stage.style.left = (vv ? vv.offsetLeft : 0) + 'px';
+  stage.style.width = vw + 'px';
+  stage.style.height = vh + 'px';
+
+  const kb = !!vv && (window.innerHeight - vv.height > 120);
+  phone.classList.toggle('kb', kb);
+
+  // keyboard shrinking the viewport must not flip us into landscape layout
+  let portrait = vh / vw >= 1.25;
+  if (kb && lastPortrait !== null) portrait = lastPortrait;
+  else lastPortrait = portrait;
+
   let s, h;
   if (portrait) {
     s = vw / W;
@@ -217,6 +255,7 @@ function fit() {
     s = Math.min(vw / W, vh / H);
     h = H;
   }
+  phone.style.width = W + 'px';
   phone.style.height = h + 'px';
   phone.style.transform = s === 1 ? '' : `scale(${s})`;
   phone.classList.toggle('framed', !portrait);
@@ -344,6 +383,7 @@ function wire() {
   $('#cAvatarClear').onclick = () => { state.contact.avatar = null; save(); renderContact(); };
 
   // phone settings
+  $('#model').onchange = e => { state.model = e.target.value; save(); fit(); };
   $('#battery').oninput = e => { state.battery = +e.target.value; save(); renderStatus(); };
   $('#showPercent').onchange = e => { state.showPercent = e.target.checked; save(); renderStatus(); };
   $('#islandChk').onchange = e => { state.island = e.target.checked; save(); applyFlags(); };
@@ -393,6 +433,7 @@ function wire() {
   // panel toggles
   $('#editBtn').onclick = () => togglePanel(true);
   $('#closePanel').onclick = () => togglePanel(false);
+  $('#saveClose').onclick = () => { saveNow(); togglePanel(false); };
 
   // composer acts like the real thing: type + send = new blue message at current time
   const input = $('#composerInput');
@@ -444,13 +485,26 @@ function wire() {
   });
 
   window.addEventListener('resize', fit);
-  if (window.visualViewport) window.visualViewport.addEventListener('resize', fit);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', fit);
+    window.visualViewport.addEventListener('scroll', fit);
+  }
 }
 
 /* ---------------- init ---------------- */
 
 function syncPanelInputs() {
   $('#cName').value = state.contact.name;
+  const sel = $('#model');
+  if (!sel.options.length) {
+    for (const [key, m] of Object.entries(MODELS)) {
+      const o = document.createElement('option');
+      o.value = key;
+      o.textContent = m.label;
+      sel.append(o);
+    }
+  }
+  sel.value = MODELS[state.model] ? state.model : '16promax';
   $('#battery').value = state.battery;
   $('#showPercent').checked = state.showPercent;
   $('#islandChk').checked = state.island;

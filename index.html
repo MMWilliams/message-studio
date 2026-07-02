@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no, interactive-widget=resizes-content">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -106,6 +106,7 @@
 
   <section>
     <h3>Phone</h3>
+    <label class="row"><span>Fit device</span><select id="model"></select></label>
     <label class="row"><span>Battery <b id="batVal">82</b>%</span><input id="battery" type="range" min="1" max="100" step="1"></label>
     <label class="row chk"><input id="showPercent" type="checkbox"><span>Show battery percentage</span></label>
     <label class="row chk"><input id="islandChk" type="checkbox"><span>Dynamic Island</span></label>
@@ -143,6 +144,10 @@
     <p class="hint">Shortcuts: <b>F</b> fullscreen · <b>E</b> editor · <b>triple-tap the phone</b> to reopen this editor when it's hidden. Everything auto-saves in this browser.</p>
     <p class="hint">On iPhone/iPad, Safari can't go fullscreen — use Share → <b>Add to Home Screen</b> and open it from there, then untick “Fake status bar + home bar” so the real one shows.</p>
   </section>
+
+  <div class="p-foot">
+    <button id="saveClose" class="btn blue">Save &amp; close</button>
+  </div>
 </aside>
 
 <script src="app.js"></script>

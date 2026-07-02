@@ -16,6 +16,11 @@ photo — for mockups, videos, and storytelling content.
   (thread auto-sorts by time), toggle each message between **Me** and **Them**
 - Contact name + photo (photo is downscaled and stored locally), initials avatar fallback
 - Dynamic Island, dark mode, optional device frame on desktop
+- Fits real iPhone screen sizes exactly — iPhone 16/17 Pro Max by default, with
+  presets for Pro/Plus/Air/mini/SE and older models (pick the one you're viewing
+  on for a pixel-perfect 1:1 render)
+- Keyboard-aware layout: when the on-screen keyboard opens, the composer sits
+  directly on top of it
 - Working composer — type in the iMessage field and hit send to add a blue
   message stamped with the current time
 - Everything persists in `localStorage` (survives refresh, per-browser).
