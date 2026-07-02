@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#000000">
+<title>Message Studio</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💬</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="stage">
+  <div id="phone">
+
+    <div id="island"></div>
+
+    <div id="topbar">
+      <div id="statusbar">
+        <div class="sb-left"><span id="sbTime">9:41</span></div>
+        <div class="sb-right">
+          <svg class="sb-ico" width="19" height="12" viewBox="0 0 19 12" fill="currentColor" aria-hidden="true">
+            <rect x="0" y="7.5" width="3.4" height="4.5" rx="1"/>
+            <rect x="5" y="5" width="3.4" height="7" rx="1"/>
+            <rect x="10" y="2.5" width="3.4" height="9.5" rx="1"/>
+            <rect x="15" y="0" width="3.4" height="12" rx="1"/>
+          </svg>
+          <svg class="sb-ico" width="17" height="12" viewBox="0 0 17 12" aria-hidden="true">
+            <circle cx="8.5" cy="10.3" r="1.5" fill="currentColor"/>
+            <path d="M4.9 7.2a5.6 5.6 0 0 1 7.2 0" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+            <path d="M1.9 4.1a10.2 10.2 0 0 1 13.2 0" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          </svg>
+          <div class="battery">
+            <div class="bat-body">
+              <div id="batFill" class="bat-fill"></div>
+              <span id="batNum" class="bat-num">82</span>
+            </div>
+            <div class="bat-cap"></div>
+          </div>
+        </div>
+      </div>
+
+      <header id="navbar">
+        <button class="nav-back" aria-label="Back">
+          <svg width="12" height="21" viewBox="0 0 12 21"><path d="M10.5 1.5 2 10.5l8.5 9" fill="none" stroke="#007AFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="nav-contact">
+          <div id="navAvatar" class="avatar"></div>
+          <div class="nav-name">
+            <span id="navName">Alex</span>
+            <svg width="7" height="11" viewBox="0 0 7 11"><path d="M1 1l4.5 4.5L1 10" stroke="#8E8E93" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+        <button class="nav-video" aria-label="FaceTime">
+          <svg width="27" height="18" viewBox="0 0 27 18" fill="#007AFF"><rect x="0" y="2" width="18" height="14" rx="4.5"/><path d="M19.5 8.4 25.4 4.3c.7-.5 1.6 0 1.6.8v7.8c0 .8-.9 1.3-1.6.8l-5.9-4.1a.7.7 0 0 1 0-1.2z"/></svg>
+        </button>
+      </header>
+    </div>
+
+    <main id="thread"></main>
+
+    <footer id="composer">
+      <button class="comp-plus" aria-label="Apps">
+        <svg width="15" height="15" viewBox="0 0 16 16"><path d="M8 1v14M1 8h14" stroke="#7C7C80" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <div class="comp-field">
+        <input id="composerInput" type="text" placeholder="iMessage" autocomplete="off" enterkeyhint="send">
+        <svg id="micIco" class="mic" width="12" height="18" viewBox="0 0 12 18" aria-hidden="true">
+          <rect x="3.6" y="0.5" width="4.8" height="10" rx="2.4" fill="#8E8E93"/>
+          <path d="M1 8.5a5 5 0 0 0 10 0M6 13.7V17" stroke="#8E8E93" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+        </svg>
+        <button id="sendBtn" class="send" aria-label="Send" hidden>
+          <svg width="13" height="13" viewBox="0 0 14 14"><path d="M7 12.5V2M2.6 6.4 7 2l4.4 4.4" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </footer>
+
+    <div id="homebar"></div>
+  </div>
+</div>
+
+<button id="editBtn" title="Open editor (E)">Edit</button>
+
+<aside id="panel">
+  <div class="p-head">
+    <h2>Thread Editor</h2>
+    <button id="closePanel" aria-label="Close editor">✕</button>
+  </div>
+
+  <section>
+    <h3>Contact</h3>
+    <label class="row"><span>Name</span><input id="cName" type="text" maxlength="30" autocomplete="off"></label>
+    <div class="row">
+      <span>Photo</span>
+      <div class="avatar-ctl">
+        <div id="avatarPreview" class="avatar small"></div>
+        <label class="btn file">Upload<input id="cAvatar" type="file" accept="image/*" hidden></label>
+        <button id="cAvatarClear" class="btn">Remove</button>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h3>Phone</h3>
+    <label class="row"><span>Battery <b id="batVal">82</b>%</span><input id="battery" type="range" min="1" max="100" step="1"></label>
+    <label class="row chk"><input id="showPercent" type="checkbox"><span>Show battery percentage</span></label>
+    <label class="row chk"><input id="islandChk" type="checkbox"><span>Dynamic Island</span></label>
+    <label class="row chk"><input id="chrome" type="checkbox"><span>Fake status bar + home bar</span></label>
+    <label class="row chk"><input id="dark" type="checkbox"><span>Dark mode</span></label>
+    <label class="row"><span>Under last sent</span>
+      <select id="receipt">
+        <option value="none">Nothing</option>
+        <option value="delivered">Delivered</option>
+        <option value="read">Read</option>
+      </select>
+    </label>
+  </section>
+
+  <section>
+    <h3>Messages</h3>
+    <p class="hint">Messages are ordered by their time. Blue = you, gray = them.</p>
+    <div id="msgList"></div>
+    <div class="btnrow">
+      <button id="addSent" class="btn blue">+ Me (blue)</button>
+      <button id="addRecv" class="btn gray">+ Them (gray)</button>
+    </div>
+  </section>
+
+  <section>
+    <div class="btnrow">
+      <button id="fsBtn" class="btn">⛶ Fullscreen</button>
+      <button id="exportBtn" class="btn">Export</button>
+      <label class="btn file">Import<input id="importFile" type="file" accept="application/json,.json" hidden></label>
+    </div>
+    <div class="btnrow">
+      <button id="resetBtn" class="btn">Load sample</button>
+      <button id="clearBtn" class="btn danger">Clear all</button>
+    </div>
+    <p class="hint">Shortcuts: <b>F</b> fullscreen · <b>E</b> editor · <b>triple-tap the phone</b> to reopen this editor when it's hidden. Everything auto-saves in this browser.</p>
+    <p class="hint">On iPhone/iPad, Safari can't go fullscreen — use Share → <b>Add to Home Screen</b> and open it from there, then untick “Fake status bar + home bar” so the real one shows.</p>
+  </section>
+</aside>
+
+<script src="app.js"></script>
+</body>
+</html>
