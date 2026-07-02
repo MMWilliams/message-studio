@@ -227,20 +227,32 @@ function fit() {
   const model = MODELS[state.model] || MODELS['16promax'];
   const W = model.w, H = model.h;
 
-  // size against the VISUAL viewport so the on-screen keyboard shrinks the
-  // phone and the composer lands right on top of the keyboard
   const vv = window.visualViewport;
-  const vw = vv ? vv.width : window.innerWidth;
-  const vh = vv ? vv.height : window.innerHeight;
+  const ae = document.activeElement;
+  const typing = !!ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA');
+  const kb = !!vv && typing && (window.innerHeight - vv.height > 120);
+  phone.classList.toggle('kb', kb);
+
+  // keyboard open: track the visual viewport so the composer rides the keyboard.
+  // keyboard closed: use the layout viewport — it reaches the physical screen
+  // edges behind iOS Safari's translucent bars, where the visual viewport
+  // under-reports and would leave a dead band at the bottom.
+  let vw, vh, top = 0, left = 0;
+  if (kb) {
+    vw = vv.width;
+    vh = vv.height;
+    top = vv.offsetTop;
+    left = vv.offsetLeft;
+  } else {
+    vw = Math.max(window.innerWidth, vv ? vv.width : 0);
+    vh = Math.max(window.innerHeight, vv ? vv.height : 0);
+  }
 
   const stage = $('#stage');
-  stage.style.top = (vv ? vv.offsetTop : 0) + 'px';
-  stage.style.left = (vv ? vv.offsetLeft : 0) + 'px';
+  stage.style.top = top + 'px';
+  stage.style.left = left + 'px';
   stage.style.width = vw + 'px';
   stage.style.height = vh + 'px';
-
-  const kb = !!vv && (window.innerHeight - vv.height > 120);
-  phone.classList.toggle('kb', kb);
 
   // keyboard shrinking the viewport must not flip us into landscape layout
   let portrait = vh / vw >= 1.25;
@@ -484,10 +496,27 @@ function wire() {
   });
 
   window.addEventListener('resize', fit);
+  window.addEventListener('orientationchange', () => setTimeout(fit, 60));
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', fit);
     window.visualViewport.addEventListener('scroll', fit);
   }
+  // keyboard show/hide animates over several frames; refit as it settles
+  for (const ev of ['focusin', 'focusout']) {
+    document.addEventListener(ev, () => { setTimeout(fit, 60); setTimeout(fit, 350); setTimeout(fit, 750); });
+  }
+  // iOS drops visualViewport resize events (esp. after keyboard dismissal in
+  // standalone mode) — watch for dimension drift and refit
+  let lastDims = '';
+  setInterval(() => {
+    const vv = window.visualViewport;
+    const d = [
+      window.innerWidth, window.innerHeight,
+      vv ? Math.round(vv.height) : 0, vv ? Math.round(vv.offsetTop) : 0,
+      document.activeElement ? document.activeElement.tagName : '',
+    ].join('|');
+    if (d !== lastDims) { lastDims = d; fit(); }
+  }, 300);
 }
 
 /* ---------------- init ---------------- */
