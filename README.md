@@ -31,7 +31,7 @@ photo — for mockups, videos, and storytelling content.
 
 | Action | How |
 |---|---|
-| Open editor | **Edit** button, or press `E`, or triple-tap the phone |
+| Open editor | Triple-tap the phone, or press `E` |
 | Close editor | `✕`, or `Esc` |
 | Fullscreen | `F` or the Fullscreen button |
 

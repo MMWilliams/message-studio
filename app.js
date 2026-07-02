@@ -431,7 +431,6 @@ function wire() {
   };
 
   // panel toggles
-  $('#editBtn').onclick = () => togglePanel(true);
   $('#closePanel').onclick = () => togglePanel(false);
   $('#saveClose').onclick = () => { saveNow(); togglePanel(false); };
 
