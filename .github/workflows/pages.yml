@@ -26,7 +26,15 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: .
+      # Pages deployments intermittently sit in deployment_queued past the
+      # action's hard 10-min ceiling — retry up to 3 attempts per run
       - id: deployment
         uses: actions/deploy-pages@v4
-        with:
-          timeout: 1800000
+        continue-on-error: true
+      - id: deployment2
+        if: steps.deployment.outcome == 'failure'
+        uses: actions/deploy-pages@v4
+        continue-on-error: true
+      - id: deployment3
+        if: steps.deployment.outcome == 'failure' && steps.deployment2.outcome == 'failure'
+        uses: actions/deploy-pages@v4
